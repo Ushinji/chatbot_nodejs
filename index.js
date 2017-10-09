@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var async = require('async');
 
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 3000));
 app.use(bodyParser.urlencoded({extended: true})); // jsonの送信を許可
 app.use(bodyParser.json());                       // jsonのパースを可能に
 
