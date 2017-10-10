@@ -22,7 +22,7 @@ app.post('/callback', function(req, res){
             var address = '東京都渋谷区';
 
             // ぐるなびAPI レストラン検索API
-            var gnavi_url = 'http://api.gnavi.co.jp/RestSearchAPI/20150630/';
+            var gnavi_url = 'https://api.gnavi.co.jp/RestSearchAPI/20150630/';
 
             // ぐるなび リクエストパラメータの設定
             var gnavi_query = {
