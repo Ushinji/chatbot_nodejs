@@ -21,13 +21,72 @@ app.post('/callback', function(req, res) {
                     return;
                 }
                 // テキストが送られてきた場合のみ返事をする
-                if ((req.body['events'][0]['type'] != 'message') || (req.body['events'][0]['message']['type'] != 'text')) {
+                if ((req.body['events'][0]['type'] != 'message')
+                    || (req.body['events'][0]['message']['type'] != 'text')) {
                     return;
                 }
-                callback()
+
+                // ぐるなびAPI レストラン検索API
+                var gnavi_url = 'https://api.gnavi.co.jp/RestSearchAPI/20150630/';
+                // ぐるなび リクエストパラメータの設定
+                var gnavi_query = {
+                    "keyid":process.env.GNAVI_ACCESS_KEY,
+                    "format": "json",
+                    "address": "東京都渋谷区",
+                    "hit_per_page": 1,
+                    "freeword": "ラーメン",
+                    "freeword_condition": 2
+                };
+                var gnavi_options = {
+                    url: gnavi_url,
+                    headers : {'Content-Type' : 'application/json; charset=UTF-8'},
+                    qs: gnavi_query,
+                    json: true
+                };
+
+                // 検索結果をオブジェクト化
+                var search_result = {};
+
+                request.get(gnavi_options, function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        if('error' in body){
+                            console.log("検索エラー" + JSON.stringify(body));
+                            return;
+                        }
+                        // 店名
+                        if('name' in body.rest){
+                            search_result['name'] = body.rest.name;
+                        }
+                        // 画像
+                        if('image_url' in body.rest){
+                            search_result['shop_image1'] = body.rest.image_url.shop_image1;
+                        }
+                        // 住所
+                        if('address' in body.rest){
+                            search_result['address'] = body.rest.address;
+                        }
+                        // 緯度
+                        if('latitude' in body.rest){
+                            search_result['latitude'] = body.rest.latitude;
+                        }
+                        // 軽度
+                        if('longitude' in body.rest){
+                            search_result['longitude'] = body.rest.longitude;
+                        }
+                        // 営業時間
+                        if('opentime' in body.rest){
+                            search_result['opentime'] = body.rest.opentime;
+                        }
+
+                        callback(null, json, search_result);
+
+                    } else {
+                        console.log('error: '+ response.statusCode);
+                    }
+                });
             },
         ],
-        function(callback) {
+        function(err, json, search_result) {
             //ヘッダーを定義
             var headers = {
                 'Content-Type': 'application/json',
@@ -37,10 +96,13 @@ app.post('/callback', function(req, res) {
             // 送信データ作成
             var data = {
                 'replyToken': req.body['events'][0]['replyToken'],
-                "messages": [{
-                    "type": "text",
-                    "text": req.body['events'][0]['message']['text']
-                }]
+                "messages": [
+                    // テキスト
+                    {
+                        "contentType": "text",
+                        "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
+                    }
+                ]
             };
 
             //オプションを定義
