@@ -18,6 +18,8 @@ app.post('/callback', function(req, res){
         function(callback) {
             var json = req.body;
 
+
+/*
             // 受信テキスト
             var search_place = json['result'][0]['content']['text'];
             var search_place_array = search_place.split("\n");
@@ -28,16 +30,16 @@ app.post('/callback', function(req, res){
                 var keyword_array = search_place_array[1].split("、");
                 gnavi_keyword = keyword_array.join();
             }
-
+*/
             // ぐるなびAPI レストラン検索API
             var gnavi_url = 'https://api.gnavi.co.jp/RestSearchAPI/20150630/';
             // ぐるなび リクエストパラメータの設定
             var gnavi_query = {
                 "keyid": process.env.GNAVI_ACCESS_KEY,
                 "format": "json",
-                "address": search_place_array[0],
+                "address": "東京都渋谷区",
                 "hit_per_page": 1,
-                "freeword": gnavi_keyword,
+                "freeword": "ラーメン",
                 "freeword_condition": 2
             };
 
