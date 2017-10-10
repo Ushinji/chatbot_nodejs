@@ -24,35 +24,10 @@ app.post('/callback', function(req, res) {
                 if ((req.body['events'][0]['type'] != 'message') || (req.body['events'][0]['message']['type'] != 'text')) {
                     return;
                 }
-                // 「くっころ」という単語がテキストに含まれている場合のみ返事をする
-                if (req.body['events'][0]['message']['text'].indexOf('くっころ') == -1) {
-                    return;
-                }
-
-                // 1対1のチャットの場合は相手のユーザ名で返事をする
-                // グループチャットの場合はユーザ名が分からないので、「貴様ら」で返事をする
-                if (req.body['events'][0]['source']['type'] == 'user') {
-                    // ユーザIDでLINEのプロファイルを検索して、ユーザ名を取得する
-                    var user_id = req.body['events'][0]['source']['userId'];
-                    var get_profile_options = {
-                        url: 'https://api.line.me/v2/bot/profile/' + user_id,
-                        proxy: process.env.FIXIE_URL,
-                        json: true,
-                        headers: {
-                            'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}'
-                        }
-                    };
-                    request.get(get_profile_options, function(error, response, body) {
-                        if (!error && response.statusCode == 200) {
-                            callback(body['displayName']);
-                        }
-                    });
-                } else if ('room' == req.body['events'][0]['source']['type']) {
-                    callback('貴様ら');
-                }
+                callback()
             },
         ],
-        function(displayName) {
+        function(callback) {
             //ヘッダーを定義
             var headers = {
                 'Content-Type': 'application/json',
@@ -64,7 +39,7 @@ app.post('/callback', function(req, res) {
                 'replyToken': req.body['events'][0]['replyToken'],
                 "messages": [{
                     "type": "text",
-                    "text": displayName + 'にこんな辱めを受けるとは...！\nくっ...殺せ！'
+                    "text": req.body['events'][0]['message']['text']
                 }]
             };
 
