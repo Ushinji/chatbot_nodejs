@@ -106,6 +106,8 @@ app.post('/callback', function(req, res){
         var to_array = [];
         to_array.push(json['result'][0]['content']['from']);
 
+        console.log('app run 4.');
+
         // 送信データ作成
         var data = {
             'to': to_array,
@@ -122,7 +124,7 @@ app.post('/callback', function(req, res){
                 ]
             }
         };
-        console.log('app run 4.');
+        console.log('app run 5.');
 
         //オプションを定義
         var options = {
