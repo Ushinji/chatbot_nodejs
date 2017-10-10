@@ -28,7 +28,7 @@ app.post('/callback', function(req, res){
             var gnavi_query = {
                 "keyid": process.env.GNAVI_ACCESS_KEY,
                 "format": "json",
-                "address": addres,
+                "address": address,
                 "hit_per_page": 1,
                 "freeword": gnavi_keyword,
                 "freeword_condition": 2
@@ -92,10 +92,8 @@ app.post('/callback', function(req, res){
 
         //ヘッダーを定義
         var headers = {
-            'Content-Type' : 'application/json; charset=UTF-8',
-            'X-Line-ChannelID' : '<Your Channel ID>',
-            'X-Line-ChannelSecret' : '<Your Channel Secret>',
-            'X-Line-Trusted-User-With-ACL' : '<Your MID>'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}',
         };
 
         // 送信相手の設定（配列）
