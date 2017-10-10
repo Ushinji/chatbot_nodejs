@@ -27,7 +27,7 @@ app.post('/callback', function(req, res) {
                 }
 
                 // 検索キーワード
-                var search_place = req.body['result'][0]['content']['text'];
+                var search_place = req.body['events'][0]['message']['text'];
                 var search_place_array = search_place.split("\n");
                 var gnavi_keyword = "";
                 if(search_place_array.length == 2){
