@@ -75,13 +75,10 @@ app.post('/callback', function(req, res) {
             // 送信データ作成
             var data = {
                 'replyToken': req.body['events'][0]['replyToken'],
-                "messages": [
-                    // テキスト
-                    {
-                        "contentType": "text",
-                        "text": 'こちらはいかがですか？\n【お店】' + search_result['name'],
-                    }
-                ]
+                "messages": [{
+                    "type": "text",
+                    "text": displayName + 'にこんな辱めを受けるとは...！\nくっ...殺せ！'
+                }]
             };
 
             //オプションを定義
