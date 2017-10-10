@@ -28,14 +28,15 @@ app.post('/callback', function(req, res) {
 
                 // ぐるなびAPI レストラン検索API
                 var gnavi_url = 'https://api.gnavi.co.jp/RestSearchAPI/20150630/';
+
                 // ぐるなび リクエストパラメータの設定
                 var gnavi_query = {
                     "keyid":process.env.GNAVI_ACCESS_KEY,
-                    "format": "json",
-                    "address": "東京都渋谷区",
-                    "hit_per_page": 1,
-                    "freeword": "ラーメン",
-                    "freeword_condition": 2
+                    "format":"json",
+                    "address":"東京都渋谷区",
+                    "hit_per_page":1,
+                    "freeword":"ラーメン",
+                    "freeword_condition":2
                 };
                 var gnavi_options = {
                     url: gnavi_url,
@@ -57,29 +58,7 @@ app.post('/callback', function(req, res) {
                         if('name' in body.rest){
                             search_result['name'] = body.rest.name;
                         }
-                        // 画像
-                        if('image_url' in body.rest){
-                            search_result['shop_image1'] = body.rest.image_url.shop_image1;
-                        }
-                        // 住所
-                        if('address' in body.rest){
-                            search_result['address'] = body.rest.address;
-                        }
-                        // 緯度
-                        if('latitude' in body.rest){
-                            search_result['latitude'] = body.rest.latitude;
-                        }
-                        // 軽度
-                        if('longitude' in body.rest){
-                            search_result['longitude'] = body.rest.longitude;
-                        }
-                        // 営業時間
-                        if('opentime' in body.rest){
-                            search_result['opentime'] = body.rest.opentime;
-                        }
-
                         callback(null, search_result);
-
                     } else {
                         console.log('error: '+ response.statusCode);
                     }
@@ -100,7 +79,7 @@ app.post('/callback', function(req, res) {
                     // テキスト
                     {
                         "contentType": "text",
-                        "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
+                        "text": 'こちらはいかがですか？\n【お店】' + search_result['name'],
                     }
                 ]
             };
