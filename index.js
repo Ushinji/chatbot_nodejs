@@ -16,7 +16,6 @@ app.post('/callback', function(req, res){
     async.waterfall([
         // ぐるなびAPI
         function(callback) {
-
             var json = req.body;
 
             // 受信テキスト
@@ -41,6 +40,7 @@ app.post('/callback', function(req, res){
                 "freeword": gnavi_keyword,
                 "freeword_condition": 2
             };
+
             var gnavi_options = {
                 url: gnavi_url,
                 headers : {'Content-Type' : 'application/json; charset=UTF-8'},
@@ -51,45 +51,38 @@ app.post('/callback', function(req, res){
             // 検索結果をオブジェクト化
             var search_result = {};
 
+            request.get(gnavi_options, function (error, response, body){
+                if (!error && response.statusCode == 200) {
+                }
+                else{
+                }
+            }
+
+            search_result['name'] = "検索結果.店名";
+            search_result['address'] = "検索結果.場所";
+            callback(null, json, search_result);
+            /*
             request.get(gnavi_options, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     if('error' in body){
                         console.log("検索エラー" + JSON.stringify(body));
                         return;
                     }
-
                     // 店名
                     if('name' in body.rest){
                         search_result['name'] = body.rest.name;
-                    }
-                    // 画像
-                    if('image_url' in body.rest){
-                        search_result['shop_image1'] = body.rest.image_url.shop_image1;
                     }
                     // 住所
                     if('address' in body.rest){
                         search_result['address'] = body.rest.address;
                     }
-                    // 緯度
-                    if('latitude' in body.rest){
-                        search_result['latitude'] = body.rest.latitude;
-                    }
-                    // 軽度
-                    if('longitude' in body.rest){
-                        search_result['longitude'] = body.rest.longitude;
-                    }
-                    // 営業時間
-                    if('opentime' in body.rest){
-                        search_result['opentime'] = body.rest.opentime;
-                    }
-
                     callback(null, json, search_result);
-
-                } else {
+                }
+                else {
                     console.log('error: '+ response.statusCode);
                 }
             });
-
+            */
         },
     ],
 
@@ -121,23 +114,7 @@ app.post('/callback', function(req, res){
                     // テキスト
                     {
                         "contentType": 1,
-                        "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
-                    },
-                    // 画像
-                    {
-                        "contentType": 2,
-                        "originalContentUrl": search_result['shop_image1'],
-                        "previewImageUrl": search_result['shop_image1']
-                    },
-                    // 位置情報
-                    {
-                        "contentType":7,
-                        "text": search_result['name'],
-                        "location":{
-                            "title": search_result['address'],
-                            "latitude": Number(search_result['latitude']),
-                            "longitude": Number(search_result['longitude'])
-                        }
+                        "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【場所】' + search_result['address'],
                     }
                 ]
             }
