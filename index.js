@@ -17,14 +17,6 @@ app.post('/callback', function(req, res){
         // ぐるなびAPI
         function(callback) {
             var json = req.body;
-                        // リクエストがLINE Platformから送られてきたか確認する
-            if (!validate_signature(req.headers['x-line-signature'], req.body)) {
-                return;
-            }
-            // テキストが送られてきた場合のみ返事をする
-            if ((req.body['events'][0]['type'] != 'message') || (req.body['events'][0]['message']['type'] != 'text')) {
-                return;
-            }
             console.log('app run 1.');
 /*
             // 受信テキスト
@@ -156,8 +148,3 @@ app.post('/callback', function(req, res){
 app.listen(app.get('port'), function() {
     console.log('Node app is running');
 });
-
-// 署名検証
-function validate_signature(signature, body) {
-    return signature == crypto.createHmac('sha256', process.env.LINE_CHANNEL_SECRET).update(new Buffer(JSON.stringify(body), 'utf8')).digest('base64');
-}
