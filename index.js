@@ -25,6 +25,7 @@ app.post('/callback', function(req, res){
             if ((req.body['events'][0]['type'] != 'message') || (req.body['events'][0]['message']['type'] != 'text')) {
                 return;
             }
+            console.log('app run 1.');
 /*
             // 受信テキスト
             var search_place = json['result'][0]['content']['text'];
@@ -66,6 +67,8 @@ app.post('/callback', function(req, res){
                 }
             });
 
+            console.log('app run 2.');
+
             search_result['name'] = "検索結果.店名";
             search_result['address'] = "検索結果.場所";
             callback(null, json, search_result);
@@ -105,6 +108,7 @@ app.post('/callback', function(req, res){
             'Content-Type' : 'application/json; charset=UTF-8',
             'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}',
         };
+        console.log('app run 3.');
 
         // 送信相手の設定（配列）
         var to_array = [];
@@ -126,6 +130,7 @@ app.post('/callback', function(req, res){
                 ]
             }
         };
+        console.log('app run 4.');
 
         //オプションを定義
         var options = {
@@ -143,7 +148,7 @@ app.post('/callback', function(req, res){
                 console.log('error: '+ JSON.stringify(response));
             }
         });
-
+        console.log('app run 5.');
     });
 
 });
@@ -151,3 +156,8 @@ app.post('/callback', function(req, res){
 app.listen(app.get('port'), function() {
     console.log('Node app is running');
 });
+
+// 署名検証
+function validate_signature(signature, body) {
+    return signature == crypto.createHmac('sha256', process.env.LINE_CHANNEL_SECRET).update(new Buffer(JSON.stringify(body), 'utf8')).digest('base64');
+}
