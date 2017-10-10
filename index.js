@@ -107,18 +107,18 @@ app.post('/callback', function(req, res) {
                 "messages": [
                     // テキスト
                     {
-                        "contentType": 1,
+                        "contentType":"text",
                         "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
                     },
                     // 画像
                     {
-                        "contentType": 2,
+                        "contentType":"image",
                         "originalContentUrl": search_result['shop_image1'],
                         "previewImageUrl": search_result['shop_image1']
                     },
                     // 位置情報
                     {
-                        "contentType":7,
+                        "contentType":"location",
                         "text": search_result['name'],
                         "location":{
                             "title": search_result['address'],
