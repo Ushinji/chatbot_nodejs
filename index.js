@@ -77,7 +77,7 @@ app.post('/callback', function(req, res) {
                 'replyToken': req.body['events'][0]['replyToken'],
                 "messages": [{
                     "type": "text",
-                    "text": 'こんな辱めを受けるとは...！\nくっ...殺せ！'
+                    "text": search_result['name']
                 }]
             };
 
