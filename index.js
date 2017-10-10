@@ -12,14 +12,13 @@ app.use(bodyParser.json());                        // JSONのパースを楽に�
 // });
 
 app.post('/callback', function(req, res){
-
     async.waterfall([
         // ぐるなびAPI
         function(callback) {
             // 受信テキスト
             var json = req.body;
             var gnavi_keyword = json['result'][0]['content']['text'];
-            var address = '東京都渋谷区';
+            var address = "東京都渋谷区";
 
             // ぐるなびAPI レストラン検索API
             var gnavi_url = 'https://api.gnavi.co.jp/RestSearchAPI/20150630/';
