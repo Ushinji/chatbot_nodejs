@@ -12,22 +12,31 @@ app.use(bodyParser.json());                        // JSONのパースを楽に�
 // });
 
 app.post('/callback', function(req, res){
+
     async.waterfall([
         // ぐるなびAPI
         function(callback) {
-            // 受信テキスト
+
             var json = req.body;
-            var gnavi_keyword = json['result'][0]['content']['text'];
-            var address = "東京都渋谷区";
+
+            // 受信テキスト
+            var search_place = json['result'][0]['content']['text'];
+            var search_place_array = search_place.split("\n");
+
+            //検索キーワード
+            var gnavi_keyword = "";
+            if(search_place_array.length == 2){
+                var keyword_array = search_place_array[1].split("、");
+                gnavi_keyword = keyword_array.join();
+            }
 
             // ぐるなびAPI レストラン検索API
             var gnavi_url = 'https://api.gnavi.co.jp/RestSearchAPI/20150630/';
-
             // ぐるなび リクエストパラメータの設定
             var gnavi_query = {
                 "keyid": process.env.GNAVI_ACCESS_KEY,
                 "format": "json",
-                "address": address,
+                "address": search_place_array[0],
                 "hit_per_page": 1,
                 "freeword": gnavi_keyword,
                 "freeword_condition": 2
@@ -48,6 +57,7 @@ app.post('/callback', function(req, res){
                         console.log("検索エラー" + JSON.stringify(body));
                         return;
                     }
+
                     // 店名
                     if('name' in body.rest){
                         search_result['name'] = body.rest.name;
@@ -91,7 +101,7 @@ app.post('/callback', function(req, res){
 
         //ヘッダーを定義
         var headers = {
-            'Content-Type': 'application/json',
+            'Content-Type' : 'application/json; charset=UTF-8',
             'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}',
         };
 
