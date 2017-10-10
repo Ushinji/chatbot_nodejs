@@ -17,8 +17,14 @@ app.post('/callback', function(req, res){
         // ぐるなびAPI
         function(callback) {
             var json = req.body;
-
-
+                        // リクエストがLINE Platformから送られてきたか確認する
+            if (!validate_signature(req.headers['x-line-signature'], req.body)) {
+                return;
+            }
+            // テキストが送られてきた場合のみ返事をする
+            if ((req.body['events'][0]['type'] != 'message') || (req.body['events'][0]['message']['type'] != 'text')) {
+                return;
+            }
 /*
             // 受信テキスト
             var search_place = json['result'][0]['content']['text'];
@@ -103,7 +109,6 @@ app.post('/callback', function(req, res){
         // 送信相手の設定（配列）
         var to_array = [];
         to_array.push(json['result'][0]['content']['from']);
-
 
         // 送信データ作成
         var data = {
