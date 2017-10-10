@@ -78,7 +78,7 @@ app.post('/callback', function(req, res) {
                             search_result['opentime'] = body.rest.opentime;
                         }
 
-                        callback(null, json, search_result);
+                        callback(null, search_result);
 
                     } else {
                         console.log('error: '+ response.statusCode);
@@ -86,7 +86,7 @@ app.post('/callback', function(req, res) {
                 });
             },
         ],
-        function(err, json, search_result) {
+        function(err, search_result) {
             //ヘッダーを定義
             var headers = {
                 'Content-Type': 'application/json',
