@@ -56,7 +56,7 @@ app.post('/callback', function(req, res){
                 }
                 else{
                 }
-            }
+            });
 
             search_result['name'] = "検索結果.店名";
             search_result['address'] = "検索結果.場所";
