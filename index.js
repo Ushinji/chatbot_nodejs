@@ -96,7 +96,7 @@ app.post('/callback', function(req, res) {
                     {
                         "type":"text",
                         "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
-                    }
+                    },
                     // 位置情報
                     {
                         "type":"location",
