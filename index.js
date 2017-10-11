@@ -16,10 +16,6 @@ app.use(bodyParser.json());
 app.post('/callback', function(req, res) {
     async.waterfall([
             function(callback) {
-                // リクエストがLINE Platformから送られてきたか確認する
-                if (!validate_signature(req.headers['x-line-signature'], req.body)) {
-                    return;
-                }
                 // テキストが送られてきた場合のみ返事をする
                 if ((req.body['events'][0]['type'] != 'message')
                     || (req.body['events'][0]['message']['type'] != 'text')) {
@@ -27,26 +23,23 @@ app.post('/callback', function(req, res) {
                 }
 
                 // 検索キーワード
-                var search_place = req.body['events'][0]['message']['text'];
-                var search_place_array = search_place.split("\n");
-                var gnavi_keyword = "";
-                if(search_place_array.length == 2){
-                    var keyword_array = search_place_array[1].split("、");
-                    gnavi_keyword = keyword_array.join();
-                }
-
-                // ぐるなびAPI レストラン検索API
-                var gnavi_url = 'https://api.gnavi.co.jp/RestSearchAPI/20150630/';
+                var input_array = req.body['events'][0]['message']['text'].split("\n");
+                var address = input_array[0];
+                var freeword = input_array[1];
 
                 // ぐるなび リクエストパラメータの設定
                 var gnavi_query = {
                     "keyid":process.env.GNAVI_ACCESS_KEY,
                     "format":"json",
-                    "address":search_place_array[0],
+                    "address":address,
                     "hit_per_page":1,
-                    "freeword":gnavi_keyword,
+                    "freeword":freeword,
                     "freeword_condition":2
                 };
+
+                // ぐるなびAPI レストラン検索API
+                var gnavi_url = 'https://api.gnavi.co.jp/RestSearchAPI/20150630/';
+
                 var gnavi_options = {
                     url: gnavi_url,
                     headers : {'Content-Type' : 'application/json; charset=UTF-8'},
@@ -66,10 +59,6 @@ app.post('/callback', function(req, res) {
                         // 店名
                         if('name' in body.rest){
                             search_result['name'] = body.rest.name;
-                        }
-                        // 画像
-                        if('image_url' in body.rest){
-                            search_result['shop_image1'] = body.rest.image_url.shop_image1;
                         }
                         // 住所
                         if('address' in body.rest){
@@ -107,7 +96,7 @@ app.post('/callback', function(req, res) {
                     {
                         "type":"text",
                         "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
-                    },
+                    }
                     // 位置情報
                     {
                         "type":"location",
@@ -142,8 +131,3 @@ app.post('/callback', function(req, res) {
 app.listen(app.get('port'), function() {
     console.log('Node app is running');
 });
-
-// 署名検証
-function validate_signature(signature, body) {
-    return signature == crypto.createHmac('sha256', process.env.LINE_CHANNEL_SECRET).update(new Buffer(JSON.stringify(body), 'utf8')).digest('base64');
-}
