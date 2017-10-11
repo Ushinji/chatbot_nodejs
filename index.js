@@ -111,7 +111,7 @@ app.post('/callback', function(req, res) {
                     // 位置情報
                     {
                         "type":"location",
-                        "title":search_result['address'],
+                        "address":search_result['address'],
                         "latitude": Number(search_result['latitude']),
                         "longitude": Number(search_result['longitude'])
                     }
