@@ -109,7 +109,8 @@ app.post('/callback', function(req, res) {
                     {
                         "contentType":"text",
                         "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
-                    },
+                    }
+                    /*,
                     // 画像
                     {
                         "contentType":"image",
@@ -126,6 +127,7 @@ app.post('/callback', function(req, res) {
                             "longitude": Number(search_result['longitude'])
                         }
                     }
+                    */
                 ]
             };
 
