@@ -108,21 +108,12 @@ app.post('/callback', function(req, res) {
                         "type":"text",
                         "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
                     },
-                    // 画像
-                    {
-                        "type":"image",
-                        "originalContentUrl": search_result['shop_image1'],
-                        "previewImageUrl": search_result['shop_image1']
-                    },
                     // 位置情報
                     {
                         "type":"location",
-                        "text": search_result['name'],
-                        "location":{
-                            "title": search_result['address'],
-                            "latitude": Number(search_result['latitude']),
-                            "longitude": Number(search_result['longitude'])
-                        }
+                        "title":search_result['address'],
+                        "latitude": Number(search_result['latitude']),
+                        "longitude": Number(search_result['longitude'])
                     }
                 ]
             };
