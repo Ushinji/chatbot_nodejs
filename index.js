@@ -104,22 +104,28 @@ app.post('/callback', function(req, res) {
             // 送信データ作成
             var data = {
                 'replyToken': req.body['events'][0]['replyToken'],
+                "messages": [{
+                    "type": "text",
+                    "text": displayName + 'にこんな辱めを受けるとは...！\nくっ...殺せ！'
+                }]
+            };
+            var data = {
+                'replyToken': req.body['events'][0]['replyToken'],
                 "messages": [
                     // テキスト
                     {
-                        "contentType":"text",
+                        "type":"text",
                         "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
-                    }
-                    /*,
+                    },
                     // 画像
                     {
-                        "contentType":"image",
+                        "type":"image",
                         "originalContentUrl": search_result['shop_image1'],
                         "previewImageUrl": search_result['shop_image1']
                     },
                     // 位置情報
                     {
-                        "contentType":"location",
+                        "type":"location",
                         "text": search_result['name'],
                         "location":{
                             "title": search_result['address'],
@@ -127,7 +133,6 @@ app.post('/callback', function(req, res) {
                             "longitude": Number(search_result['longitude'])
                         }
                     }
-                    */
                 ]
             };
 
