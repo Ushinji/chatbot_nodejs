@@ -51,8 +51,18 @@ app.post('/callback', function(req, res) {
                             console.log("検索エラー" + JSON.stringify(body));
                             return;
                         }
-                        console.log('StatudCod: '+ response.statusCode);
-                        console.log(response);
+                        // インテント取得
+                        if('intent' in body.topScoringIntent){
+                            luis_result['intent'] = body.topScoringIntent.intent;
+                        }
+                        // 検索ワード
+                        if('type' in body.entities){
+                            body.entities.forEach(function(entity){
+                                if( entity.type == "search_word"){
+                                    luis_result['search_word'] = body.rest.entity;
+                                }
+                            });
+                        }
                         callback(null, luis_result);
                     } else {
                         console.log('error: '+ response.statusCode);
@@ -60,8 +70,7 @@ app.post('/callback', function(req, res) {
                 });
             },
         ],
-        function(err, search_result) {
-/*
+        function(err, luis_result) {
             //ヘッダーを定義
             var headers = {
                 'Content-Type': 'application/json',
@@ -73,7 +82,7 @@ app.post('/callback', function(req, res) {
                     // テキスト
                     {
                         "type":"text",
-                        "text": 'こちらはいかがですか？\n【お店】' + search_result['name'] + '\n【営業時間】' + search_result['opentime'],
+                        "text": '検索ワードはこちらですか？\n【検索ワード】'+ luis_result['search_word'] 
                     }
                 ]
             };
@@ -93,7 +102,6 @@ app.post('/callback', function(req, res) {
                     console.log('error: ' + JSON.stringify(response));
                 }
             });
-*/
         }
     );
 });
