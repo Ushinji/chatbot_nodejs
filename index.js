@@ -37,7 +37,7 @@ app.post('/callback', function(req, res) {
                 //オプションを定義
                 var luis_options = {
                     url: url,
-                    headers : {'Content-Type' : 'application/json; charset=UTF-8'},
+                    headers : {'Content-Type' : 'application/json'},
                     qs: luis_query,
                     json: true,
                 };
