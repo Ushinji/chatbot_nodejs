@@ -57,8 +57,8 @@ app.post('/callback', function(req, res) {
                         }
                         // 検索ワード
                         body.entities.forEach(function(entity){
-                            if( entity.type == ’search_word’){
-                                luis_result['search_word'] = body.rest.entity;
+                            if( entity.type == "search_word" ){
+                                luis_result['search_word'] = entity.entity;
                             }
                         });
 
@@ -82,7 +82,7 @@ app.post('/callback', function(req, res) {
                     // テキスト
                     {
                         "type":"text",
-                        "text": '検索ワードはこちらですか？\n【検索ワード】'+ luis_result['search_word']
+                        "text": luis_result['search_word'] + "\n検索ワードはこちらですか？\n【検索ワード】"+ luis_result['search_word']
                     }
                 ]
             };
