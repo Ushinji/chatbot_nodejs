@@ -56,13 +56,12 @@ app.post('/callback', function(req, res) {
                             luis_result['intent'] = body.topScoringIntent.intent;
                         }
                         // 検索ワード
-                        if('type' in body.entities){
-                            body.entities.forEach(function(entity){
-                                if( entity.type == "search_word"){
-                                    luis_result['search_word'] = body.rest.entity;
-                                }
-                            });
-                        }
+                        body.entities.forEach(function(entity){
+                            if( entity.type == ’search_word’){
+                                luis_result['search_word'] = body.rest.entity;
+                            }
+                        });
+
                         console.log(body);
                         callback(null, luis_result);
                     } else {
