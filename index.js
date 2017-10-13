@@ -63,6 +63,7 @@ app.post('/callback', function(req, res) {
                                 }
                             });
                         }
+                        console.log(body);
                         callback(null, luis_result);
                     } else {
                         console.log('error: '+ response.statusCode);
@@ -82,7 +83,7 @@ app.post('/callback', function(req, res) {
                     // テキスト
                     {
                         "type":"text",
-                        "text": '検索ワードはこちらですか？\n【検索ワード】'+ luis_result['search_word'] 
+                        "text": '検索ワードはこちらですか？\n【検索ワード】'+ luis_result['search_word']
                     }
                 ]
             };
