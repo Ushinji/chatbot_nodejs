@@ -83,10 +83,10 @@ app.post('/callback', function(req, res) {
                         request.get( wiki_options, function (error, response, body) {
                             if (!error && response.statusCode == 200) {
                                 console.log(response.body);
-                                if(response.body[0] != null){
+                                if(response.body.length != 0){
                                     result['wiki_content'] = response.body[0].body.substr(0,140);
                                 }else{
-                                    result['wiki_content'] =　null;
+                                    result['wiki_content'] =　"";
                                 }
                                 callback(null, result);
                             }
@@ -111,7 +111,7 @@ app.post('/callback', function(req, res) {
             };
 
             var data = {};
-            if( result['wiki_content'] != null ){
+            if( result['wiki_content'] != "" ){
                 data = {
                     'replyToken': req.body['events'][0]['replyToken'],
                     "messages": [
