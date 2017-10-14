@@ -83,8 +83,11 @@ app.post('/callback', function(req, res) {
                         request.get( wiki_options, function (error, response, body) {
                             if (!error && response.statusCode == 200) {
                                 console.log(response.body);
-                                result['wiki_content'] = response.body[0].body.substr(0,140);
-                                result['search_word'] = luis_result['search_word'];
+                                if(response.body[0] != null){
+                                    result['wiki_content'] = response.body[0].body.substr(0,140);
+                                }else{
+                                    result['wiki_content'] =　null;
+                                }
                                 callback(null, result);
                             }
                             else {
@@ -106,21 +109,37 @@ app.post('/callback', function(req, res) {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}',
             };
-            var data = {
-                'replyToken': req.body['events'][0]['replyToken'],
-                "messages": [
-                    // テキスト
-                    {
-                        "type":"text",
-                        "text": result['search_word'] + 'について説明しよう！',
-                    },
-                    // テキスト
-                    {
-                        "type":"text",
-                        "text": result['wiki_content'],
-                    }
-                ]
-            };
+
+            var data = {};
+            if( result['wiki_content'] != null ){
+                data = {
+                    'replyToken': req.body['events'][0]['replyToken'],
+                    "messages": [
+                        // テキスト
+                        {
+                            "type":"text",
+                            "text": result['search_word'] + 'について説明しよう！',
+                        },
+                        // テキスト
+                        {
+                            "type":"text",
+                            "text": result['wiki_content'],
+                        }
+                    ]
+                };
+            }
+            else{
+                data = {
+                    'replyToken': req.body['events'][0]['replyToken'],
+                    "messages": [
+                        // テキスト
+                        {
+                            "type":"text",
+                            "text":result['search_word'] + 'は難しい...',
+                        }
+                    ]
+                };
+            }
 
             //オプションを定義
             var options = {
