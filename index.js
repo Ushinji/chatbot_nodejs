@@ -65,8 +65,10 @@ app.post('/callback', function(req, res) {
                             if( entity.type == "search_word" ){
                                 luis_result['search_word'] = entity.entity;
                             }
+                            callback(null, luis_result);
                         });
 
+                        /*
                         var wiki_url = "http://ja.wikipedia.org/w/api.php";
                         var wiki_query = {
                             "format":"json",
@@ -88,7 +90,6 @@ app.post('/callback', function(req, res) {
                         console.log("Wiki before");
 
                         request.get( wiki_options, function (error, response, body) {
-
                             console.log("Wiki after");
 
                             if (!error && response.statusCode == 200) {
@@ -112,6 +113,7 @@ app.post('/callback', function(req, res) {
                                 return;
                             }
                         });
+                        */
                     } else {
                         console.log('error: '+ response.statusCode);
                         return;
@@ -119,7 +121,7 @@ app.post('/callback', function(req, res) {
                 });
             },
         ],
-        function(err, result) {
+        function(err, luis_result) {
 
             console.log("LINE Receive before");
 
@@ -135,13 +137,16 @@ app.post('/callback', function(req, res) {
                     // テキスト
                     {
                         "type":"text",
-                        "text": result['search_word'] + 'について説明しよう！',
-                    },
+                        "text": luis_result['search_word'] + 'について説明しよう！',
+                    }
+/*
+                    <
                     // テキスト
                     {
                         "type":"text",
                         "text": result['wiki_page'],
                     }
+*/
                 ]
             };
 
@@ -157,7 +162,7 @@ app.post('/callback', function(req, res) {
             // LINEメッセージ送信元へメッセージを送信
             request.post(options, function(error, response, body) {
 
-                console.log("LINE Receive after "); 
+                console.log("LINE Receive after ");
 
                 if (!error && response.statusCode == 200) {
                     console.log(body);
