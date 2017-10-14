@@ -63,21 +63,19 @@ app.post('/callback', function(req, res) {
                         // 検索ワード
                         body.entities.forEach(function(entity){
                             if( entity.type == "search_word" ){
-                                luis_result['search_word'] = entity.entity;
+                                result['search_word'] = entity.entity;
                             }
-                            callback(null, luis_result);
                         });
 
-                        /*
-                        var wiki_url = "http://ja.wikipedia.org/w/api.php";
+                        var wiki_url = "https://ja.wikipedia.org/w/api.php";
                         var wiki_query = {
-                            "format":"json",
                             "action":"query",
+                            "format":"json",
                             "prop":"extracts",
                             "redirects":1,
                             "exchars":300,
                             "explaintext":1,
-                            "titles":luis_result['search_word'],
+                            "titles":result['search_word'],
                         };
 
                         //オプションを定義
@@ -101,10 +99,10 @@ app.post('/callback', function(req, res) {
                                 var data = JSON.parse(body);
                                 var str = data.query.pages.id.value.extract;
 
-                                result['wiki_page'] = str.str.substr(0,140);
+                                result['wiki_content'] = str.str.substr(0,140);
                                 result['search_word'] = luis_result['search_word']
 
-                                console.log(result['wiki_page'] + ", " + result['search_word']);
+                                console.log(result['wiki_content'] + ", " + result['search_word']);
 
                                 callback(null, result);
                             }
@@ -113,7 +111,6 @@ app.post('/callback', function(req, res) {
                                 return;
                             }
                         });
-                        */
                     } else {
                         console.log('error: '+ response.statusCode);
                         return;
@@ -139,14 +136,12 @@ app.post('/callback', function(req, res) {
                         "type":"text",
                         "text": luis_result['search_word'] + 'について説明しよう！',
                     }
-/*
-                    <
+                    ,
                     // テキスト
                     {
                         "type":"text",
-                        "text": result['wiki_page'],
+                        "text": result['wiki_content'],
                     }
-*/
                 ]
             };
 
