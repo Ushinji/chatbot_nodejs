@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var async = require('async');
 var wiki = require("node-wikipedia");
+var str_space = " ";
 
 app.set('port', (process.env.PORT || 8000));
 // JSONの送信を許可
@@ -50,7 +51,7 @@ app.post('/callback', function(req, res) {
                     }
                     body.entities.forEach(function(entity){
                         if( entity.type == "search_word" ){
-                            result['search_word'] = entity.entity;
+                            result['search_word'] = entity.entity.replace(str_space,"");
                         }
                     });
                     callback(null, result);
@@ -127,7 +128,7 @@ app.post('/callback', function(req, res) {
                 json: true,
                 body: data
             };
-            
+
             request.post(options, function(error, response, body) {
                 if (!error && response.statusCode == 200) {
                     console.log(body);
