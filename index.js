@@ -81,6 +81,7 @@ app.post('/callback', function(req, res) {
 
                         request.get( wiki_options, function (error, response, body) {
                             if (!error && response.statusCode == 200) {
+                                console.log(response);
                                 result['wiki_content'] = response.body[0].body.substr(0,140);
                                 result['search_word'] = luis_result['search_word'];
                                 callback(null, result);
