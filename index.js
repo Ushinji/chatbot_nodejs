@@ -48,6 +48,9 @@ app.post('/callback', function(req, res) {
                 var result = {};
 
                 request.get(luis_options, function (error, response, body) {
+
+                    console.log("Luis after");
+
                     if (!error && response.statusCode == 200) {
                         if('error' in body){
                             console.log("検索エラー" + JSON.stringify(body));
@@ -82,8 +85,12 @@ app.post('/callback', function(req, res) {
                             qs: wiki_query,
                             json: true,
                         };
+                        console.log("Wiki before");
 
                         request.get( wiki_options, function (error, response, body) {
+
+                            console.log("Wiki after");
+
                             if (!error && response.statusCode == 200) {
                                 if('error' in body){
                                     console.log("検索エラー" + JSON.stringify(body));
@@ -113,6 +120,9 @@ app.post('/callback', function(req, res) {
             },
         ],
         function(err, result) {
+
+            console.log("LINE Receive before");
+
             //ヘッダーを定義
             var headers = {
                 'Content-Type': 'application/json',
@@ -146,6 +156,9 @@ app.post('/callback', function(req, res) {
 
             // LINEメッセージ送信元へメッセージを送信
             request.post(options, function(error, response, body) {
+
+                console.log("LINE Receive after "); 
+
                 if (!error && response.statusCode == 200) {
                     console.log(body);
                 } else {
