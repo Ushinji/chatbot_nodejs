@@ -49,8 +49,6 @@ app.post('/callback', function(req, res) {
 
                 request.get(luis_options, function (error, response, body) {
 
-                    console.log("Luis after");
-
                     if (!error && response.statusCode == 200) {
                         if('error' in body){
                             console.log("検索エラー" + JSON.stringify(body));
@@ -67,15 +65,10 @@ app.post('/callback', function(req, res) {
                             }
                         });
 
-                        var wiki_url = "https://ja.wikipedia.org/w/api.php";
+                        var wiki_url = 'http://wikipedia.simpleapi.net/api';
                         var wiki_query = {
-                            "action":"query",
-                            "format":"json",
-                            "prop":"extracts",
-                            "redirects":1,
-                            "exchars":300,
-                            "explaintext":1,
-                            "titles":result['search_word'],
+                            'output':'json',
+                            'keyword':search_word,
                         };
 
                         //オプションを定義
@@ -85,25 +78,15 @@ app.post('/callback', function(req, res) {
                             qs: wiki_query,
                             json: true,
                         };
-                        console.log("Wiki before");
 
                         request.get( wiki_options, function (error, response, body) {
-                            console.log("Wiki after");
-
                             if (!error && response.statusCode == 200) {
                                 if('error' in body){
                                     console.log("検索エラー" + JSON.stringify(body));
                                     return;
                                 }
-
-                                var data = JSON.parse(body);
-                                var str = data.query.pages.id.value.extract;
-
-                                result['wiki_content'] = str.str.substr(0,140);
-                                result['search_word'] = luis_result['search_word']
-
-                                console.log(result['wiki_content'] + ", " + result['search_word']);
-
+                                result['wiki_content'] = response.body[0].body.substr(0,140);
+                                result['search_word'] = luis_result['search_word'];
                                 callback(null, result);
                             }
                             else {
@@ -118,25 +101,21 @@ app.post('/callback', function(req, res) {
                 });
             },
         ],
-        function(err, luis_result) {
-
-            console.log("LINE Receive before");
+        function(err, result) {
 
             //ヘッダーを定義
             var headers = {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}',
             };
-
             var data = {
                 'replyToken': req.body['events'][0]['replyToken'],
                 "messages": [
                     // テキスト
                     {
                         "type":"text",
-                        "text": luis_result['search_word'] + 'について説明しよう！',
-                    }
-                    ,
+                        "text": result['search_word'] + 'について説明しよう！',
+                    },
                     // テキスト
                     {
                         "type":"text",
@@ -156,16 +135,12 @@ app.post('/callback', function(req, res) {
 
             // LINEメッセージ送信元へメッセージを送信
             request.post(options, function(error, response, body) {
-
-                console.log("LINE Receive after ");
-
                 if (!error && response.statusCode == 200) {
                     console.log(body);
                 } else {
                     console.log('error: ' + JSON.stringify(response));
                 }
             });
-
         }
     );
 });
