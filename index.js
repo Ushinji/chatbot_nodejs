@@ -3,6 +3,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var request = require('request');
 var async = require('async');
+var wiki = require("node-wikipedia");
 
 app.set('port', (process.env.PORT || 8000));
 // JSONの送信を許可
@@ -21,22 +22,22 @@ app.post('/callback', function(req, res) {
                     return;
                 }
                 // 検索キーワード
-                var in_word = req.body['events'][0]['message']['text'];
+                var phrase = req.body['events'][0]['message']['text'];
 
-                var url = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/37005d38-9ccf-4963-af7a-d6b1bf049654";
+                var luis_url = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/37005d38-9ccf-4963-af7a-d6b1bf049654";
 
-                // ぐるなび リクエストパラメータの設定
+                // luisパラメタ
                 var luis_query = {
                     "subscription-key":process.env.LUIS_SUBSCRIPTION_KEY,
                     "staging":true,
                     "timezoneOffset":0,
                     "verbose":true,
-                    "q":in_word
+                    "q":phrase,
                 };
 
                 //オプションを定義
                 var luis_options = {
-                    url: url,
+                    url: luis_url,
                     headers : {'Content-Type' : 'application/json'},
                     qs: luis_query,
                     json: true,
@@ -44,6 +45,7 @@ app.post('/callback', function(req, res) {
 
                 // 検索結果をオブジェクト化
                 var luis_result = {};
+                var result = {};
 
                 request.get(luis_options, function (error, response, body) {
                     if (!error && response.statusCode == 200) {
@@ -62,30 +64,75 @@ app.post('/callback', function(req, res) {
                             }
                         });
 
-                        console.log(body);
-                        callback(null, luis_result);
+                        var wiki_url = "http://ja.wikipedia.org/w/api.php";
+                        var wiki_query = {
+                            "format":"json",
+                            "action":"query",
+                            "prop":"extracts",
+                            "redirects":1,
+                            "exchars":300,
+                            "explaintext":1,
+                            "titles":luis_result['search_word'],
+                        };
+
+                        //オプションを定義
+                        var wiki_options = {
+                            url: wiki_url,
+                            headers : {'Content-Type' : 'application/json'},
+                            qs: wiki_query,
+                            json: true,
+                        };
+
+                        request.get( wiki_options, function (error, response, body) {
+                            if (!error && response.statusCode == 200) {
+                                if('error' in body){
+                                    console.log("検索エラー" + JSON.stringify(body));
+                                    return;
+                                }
+
+                                var data = JSON.parse(body);
+                                var str = data.query.pages.id.value.extract;
+
+                                result['wiki_page'] = str.str.substr(0,140);
+                                result['search_word'] = luis_result['search_word']
+
+                                callback(null, result);
+                            }
+                            else {
+                                console.log('error: '+ response.statusCode);
+                                return;
+                            }
+                        });
                     } else {
                         console.log('error: '+ response.statusCode);
+                        return;
                     }
                 });
             },
         ],
-        function(err, luis_result) {
+        function(err, result) {
             //ヘッダーを定義
             var headers = {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}',
             };
+
             var data = {
                 'replyToken': req.body['events'][0]['replyToken'],
                 "messages": [
                     // テキスト
                     {
                         "type":"text",
-                        "text": luis_result['search_word'] + "\n検索ワードはこちらですか？\n【検索ワード】"+ luis_result['search_word']
+                        "text": result['search_word'] + 'について説明しよう！',
+                    },
+                    // テキスト
+                    {
+                        "type":"text",
+                        "text": result['wiki_page'],
                     }
                 ]
             };
+
             //オプションを定義
             var options = {
                 url: 'https://api.line.me/v2/bot/message/reply',
@@ -94,6 +141,7 @@ app.post('/callback', function(req, res) {
                 json: true,
                 body: data
             };
+
             // LINEメッセージ送信元へメッセージを送信
             request.post(options, function(error, response, body) {
                 if (!error && response.statusCode == 200) {
@@ -102,6 +150,7 @@ app.post('/callback', function(req, res) {
                     console.log('error: ' + JSON.stringify(response));
                 }
             });
+
         }
     );
 });
