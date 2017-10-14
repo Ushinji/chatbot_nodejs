@@ -62,7 +62,6 @@ app.post('/callback', function(req, res) {
                         body.entities.forEach(function(entity){
                             if( entity.type == "search_word" ){
                                 result['search_word'] = entity.entity;
-                                console.log(result['search_word']);
                             }
                         });
 
