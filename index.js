@@ -96,6 +96,8 @@ app.post('/callback', function(req, res) {
                                 result['wiki_page'] = str.str.substr(0,140);
                                 result['search_word'] = luis_result['search_word']
 
+                                console.log(result['wiki_page'] + ", " + result['search_word']);
+
                                 callback(null, result);
                             }
                             else {
