@@ -68,7 +68,7 @@ app.post('/callback', function(req, res) {
                         var wiki_url = 'http://wikipedia.simpleapi.net/api';
                         var wiki_query = {
                             'output':'json',
-                            'keyword':search_word,
+                            'keyword':result['search_word'],
                         };
 
                         //オプションを定義
