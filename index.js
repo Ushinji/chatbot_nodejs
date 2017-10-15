@@ -17,6 +17,7 @@ app.use(bodyParser.json());
 app.post('/callback', function(req, res) {
     async.waterfall([
         function(callback) {
+            console.log(req);
             // テキストが送られてきた場合のみ返事をする
             if ((req.body['events'][0]['type'] != 'message')
                 || (req.body['events'][0]['message']['type'] != 'text')) {
@@ -73,7 +74,7 @@ app.post('/callback', function(req, res) {
 
         // LINEの応答の作成
         function(err, result) {
-            var line_options = api.create_line_options(req, resutl);
+            var line_options = api.create_line_options(req, result);
             request.post(options, function(error, response, body) {
                 if (!error && response.statusCode == 200) {
                     console.log(body);
