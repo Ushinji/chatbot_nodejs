@@ -120,7 +120,7 @@ app.post('/callback', function(req, res) {
                     "messages": [
                         {
                             "type":"text",
-                            "text":'ぐぬぬ...',
+                            "text":'ぐぬぬ...分からん...',
                         }
                     ]
                 };
