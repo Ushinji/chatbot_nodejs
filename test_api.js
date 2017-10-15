@@ -2,7 +2,6 @@ var assert = require('assert');
 var api = require('./api.js');
 var async = require('async');
 
-/*
 async.waterfall([
     function(callback) {
         var result = {};
@@ -26,7 +25,6 @@ async.waterfall([
 ],function(err, result){
     console.log(result);
 });
-*/
 
 async.waterfall([
     function(callback) {
@@ -36,7 +34,7 @@ async.waterfall([
         }
         callback(null, result);
     }
-],function(err, result){    
+],function(err, result){
     var req = {
         body: {
             events: [
