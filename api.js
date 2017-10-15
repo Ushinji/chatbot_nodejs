@@ -1,5 +1,32 @@
+var request = require('request');
 
-exports.create_luis_options = function(phrase) {
+exports.analyze_by_luis = function(phrase, callback){
+    var result = {};
+    var luis_options = create_luis_options(phrase);
+    request.get(luis_options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            if('error' in body){
+                console.log("検索エラー" + JSON.stringify(body));
+            }
+            else{
+                if('intent' in body.topScoringIntent){
+                    result['intent'] = body.topScoringIntent.intent;
+                }
+                body.entities.forEach(function(entity){
+                    if( entity.type == "search_word" ){
+                        result['search_word'] = entity.entity;
+                    }
+                });
+            }
+        }
+        else {
+            console.log('error: '+ response.statusCode);
+        }
+        callback(result);
+    });
+}
+
+function create_luis_options(phrase) {
     var url = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/37005d38-9ccf-4963-af7a-d6b1bf049654";
     var query = {
         "subscription-key":process.env.LUIS_SUBSCRIPTION_KEY,
@@ -15,9 +42,30 @@ exports.create_luis_options = function(phrase) {
     return options;
 }
 
-exports.create_wiki_options = function(search_word) {
+exports.get_wiki_content = function(search_word, callback){
+    var wiki_content ="";
+    var wiki_options = create_wiki_options(search_word);
+    request.get( wiki_options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            if('error' in body){
+                console.log("検索エラー" + JSON.stringify(body));
+                return;
+            }
+            if(response.body != null ){
+                wiki_content = response.body[0].body;
+            }
+        }
+        else {
+            console.log('error: '+ response.statusCode);
+            return;
+        }
+        callback(wiki_content);
+    });
+}
+
+function create_wiki_options(search_word) {
     var str_space = " ";
-    var edit_search_word = search_word.replace(str_space,"");
+    var edit_search_word = search_word.replace(str_space, "");
 
     var url = 'http://wikipedia.simpleapi.net/api';
     var query = {
@@ -33,8 +81,19 @@ exports.create_wiki_options = function(search_word) {
     return options;
 }
 
-exports.create_line_options = function(req, result) {
+exports.send_line_response = function(req, result, callback) {
+    var line_options = create_line_options(req, result);
+    request.post(line_options, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log(body);
+        } else {
+            console.log('error: ' + JSON.stringify(response));
+        }
+        callback();
+    });
+}
 
+function create_line_options(req, result) {
     var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}',
@@ -45,7 +104,7 @@ exports.create_line_options = function(req, result) {
         'replyToken':req.body['events'][0]['replyToken'],
         'messages': messages,
     };
-    
+
     var options = {
         url: 'https://api.line.me/v2/bot/message/reply',
         proxy: process.env.FIXIE_URL,

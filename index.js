@@ -17,70 +17,29 @@ app.use(bodyParser.json());
 app.post('/callback', function(req, res) {
     async.waterfall([
         function(callback) {
-            console.log(req);
             // テキストが送られてきた場合のみ返事をする
             if ((req.body['events'][0]['type'] != 'message')
                 || (req.body['events'][0]['message']['type'] != 'text')) {
                 return;
             }
-
             // 入力された本文を取得し、LUISのAPIヘ送信
-            var phrase = req.body['events'][0]['message']['text'];
-            var luis_options = api.create_luis_options(phrase);
-
             var result = {};
-            request.get(luis_options, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    if('error' in body){
-                        console.log("検索エラー" + JSON.stringify(body));
-                        return;
-                    }
-
-                    if('intent' in body.topScoringIntent){
-                        result['intent'] = body.topScoringIntent.intent;
-                    }
-
-                    body.entities.forEach(function(entity){
-                        if( entity.type == "search_word" ){
-                            result['search_word'] = entity.entity;
-                        }
-                    });
-
-                    callback(null, result);
-
-                } else {
-                    console.log('error: '+ response.statusCode);
-                    return;
-                }
+            var phrase = req.body['events'][0]['message']['text'];
+            api.analyze_by_luis(phrase, function(result){
+                callback(null, result);
             });
         },
         // Wikipediaで検索
         function(result, callback) {
-            var wiki_options = api.create_wiki_options(result['search_word']);
-            request.get( wiki_options, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-
-                    if(response.body != null ){
-                        result['wiki_content'] = response.body[0].body;
-                    }
-                    callback(null, result);
-                }
-                else {
-                    console.log('error: '+ response.statusCode);
-                    return;
-                }
+            var search_word = result['search_word'];
+            api.get_wiki_content(search_word, function(wiki_content){
+                result['wiki_content'] = wiki_content;
+                callback(null, result);
             });
         }],
-
         // LINEの応答の作成
         function(err, result) {
-            var line_options = api.create_line_options(req, result);
-            request.post(line_options, function(error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    console.log(body);
-                } else {
-                    console.log('error: ' + JSON.stringify(response));
-                }
+            api.send_line_response(req, result, function(result){
             });
         }
     );

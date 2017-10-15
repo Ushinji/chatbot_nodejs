@@ -1,41 +1,63 @@
 var assert = require('assert');
 var api = require('./api.js');
+var async = require('async');
 
-var phrase = "人工知能について知りたい！";
-var luis_options = api.create_luis_options(phrase);
-//console.log(luis_options);
-
-
-var search_word = "人工 知能";
-var wiki_options = api.create_wiki_options(search_word);
-//console.log(wiki_options);
-
-
-var content = "人工知能についての文";
-var result = {
-    "search_word":search_word,
-    "wiki_content":content
-}
-var req = {
-    body: {
-        events: [
-            {
-              "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
-              "type": "message",
-              "timestamp": 1462629479859,
-              "source": {
-                   "type": "user",
-                   "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
-               },
-               "message": {
-                   "id": "325708",
-                   "type": "text",
-                   "text": "Hello, world"
-                }
-            }
-        ]
+/*
+async.waterfall([
+    function(callback) {
+        var result = {};
+        var phrase = "人工知能について知りたい！";
+        api.analyze_by_luis(phrase, function(result){
+            callback(null, result);
+        });
     }
-}
-var line_options = api.create_line_options(req, result);
-console.log(line_options);
-console.log( line_options.body['messages'] );
+],function(err, result){
+    console.log(result);
+});
+
+async.waterfall([
+    function(callback) {
+        var result = {};
+        var search_word = "人工 知能";
+        api.get_wiki_content(search_word, function(result){
+            callback(null, result);
+        });
+    }
+],function(err, result){
+    console.log(result);
+});
+*/
+
+async.waterfall([
+    function(callback) {
+        var result = {
+            "search_word":"人工知能",
+            "wiki_content":"人工知能の文"
+        }
+        callback(null, result);
+    }
+],function(err, result){    
+    var req = {
+        body: {
+            events: [
+                {
+                  "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+                  "type": "message",
+                  "timestamp": 1462629479859,
+                  "source": {
+                       "type": "user",
+                       "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
+                   },
+                   "message": {
+                       "id": "325708",
+                       "type": "text",
+                       "text": "Hello, world"
+                    }
+                }
+            ]
+        }
+    }
+    api.send_line_response(req, result, function(result){
+        console.log("Send");
+    });
+});
