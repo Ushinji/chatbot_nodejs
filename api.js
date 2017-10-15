@@ -43,7 +43,6 @@ exports.create_line_options = function(req, result) {
         'replyToken':req.body['events'][0]['replyToken'],
         'messages': messages
     };
-
     var options = {
         url: 'https://api.line.me/v2/bot/message/reply',
         proxy: process.env.FIXIE_URL,

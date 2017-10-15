@@ -18,7 +18,8 @@ app.post('/callback', function(req, res) {
     async.waterfall([
         function(callback) {
             // テキストが送られてきた場合のみ返事をする
-            if( !api.isTextReqest(req) ){
+            if( req.body['events'][0]['message'] != "messages"
+                || req.body['events'][0]['message']['type'] != "text" ){
                 return;
             }
 
