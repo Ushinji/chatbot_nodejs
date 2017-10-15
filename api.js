@@ -34,15 +34,18 @@ exports.create_wiki_options = function(search_word) {
 }
 
 exports.create_line_options = function(req, result) {
+
     var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer {' + process.env.LINE_CHANNEL_ACCESS_TOKEN + '}',
     };
     var messages = create_line_res_messages(result);
+
     var data = {
         'replyToken':req.body['events'][0]['replyToken'],
-        'messages': messages
+        'messages': messages,
     };
+    
     var options = {
         url: 'https://api.line.me/v2/bot/message/reply',
         proxy: process.env.FIXIE_URL,
@@ -50,12 +53,12 @@ exports.create_line_options = function(req, result) {
         json: true,
         body: data
     };
+    return options;
 }
 
 function create_line_res_messages(result){
     const CONTENT_LENGTH = 140;
     var messages = [];
-
     if('search_word' in result && 'wiki_content' in result){
         messages = [
             {
